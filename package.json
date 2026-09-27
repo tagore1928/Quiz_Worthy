@@ -11,8 +11,18 @@
     "build:backend": "npm --prefix backend run build",
     "install:all": "npm install && npm --prefix frontend install && npm --prefix backend install"
   },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "groq-sdk": "^1.6.0"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.0",
+    "@vercel/node": "^3.2.14",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.5.3"
   }
 }
-
