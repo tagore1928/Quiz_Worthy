@@ -37,11 +37,9 @@ app.get(['/api/health', '/health'], (req: Request, res: Response) => {
   });
 });
 
-// Start Express Server for standalone/local development
-if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Quiz Worthy server running on http://localhost:${PORT}`);
-  });
-}
+// Always listen on process.env.PORT for both Vercel Services and local development
+app.listen(PORT, () => {
+  console.log(`🚀 Quiz Worthy server running on port ${PORT}`);
+});
 
 export default app;
