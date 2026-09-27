@@ -11,31 +11,23 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin, localhost, vercel.app preview/production domains, or CLIENT_URL
-    if (
-      !origin ||
-      origin.startsWith('http://localhost:') ||
-      origin.startsWith('http://127.0.0.1:') ||
-      origin.endsWith('.vercel.app') ||
-      origin === 'https://quizworthy-nine.vercel.app' ||
-      origin === process.env.CLIENT_URL
-    ) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Permissive for API clients
-    }
+    // Permissive CORS to allow all previews, Vercel deployments and localhost
+    callback(null, true);
   },
   credentials: true
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// Universal mounting to handle any Vercel service rewrite variation
 app.use('/api/quiz', quizRoutes);
 app.use('/quiz', quizRoutes);
+app.use('/api', quizRoutes);
+app.use('/', quizRoutes);
 
 // Health check route
 app.get(['/api/health', '/health'], (req: Request, res: Response) => {
-  res.json({
+  res.status(200).json({
     status: 'ok',
     service: 'Quiz Worthy Backend API',
     timestamp: new Date().toISOString(),
