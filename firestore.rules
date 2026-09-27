@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if the user is the owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Helper function to check if the user has an admin role
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // --- Users Collection & Subcollections ---
+    match /users/{userId} {
+      // Anyone logged in can read user profiles (needed for the leaderboard and profile lookups)
+      allow read: if isAuthenticated();
+      
+      // Users can create their own profile during registration/onboarding
+      allow create: if isOwner(userId);
+      
+      // Users can update their own profile; Admins can update any profile (e.g. role change or reset)
+      allow update: if isOwner(userId) || isAdmin();
+      
+      // Only admins can delete profiles
+      allow delete: if isAdmin();
+
+      // Subcollection for user quiz attempts
+      match /quiz_attempts/{attemptId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Subcollection for daily tasks
+      match /daily_todos/{todoId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Subcollection for contribution/activity tracker
+      match /activity/{activityId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // --- Topics Collection ---
+    match /topics/{topicId} {
+      // Any authenticated user can read topics to browse and play quizzes
+      allow read: if isAuthenticated();
+      // Only admins can create, update, or delete quiz topics
+      allow write, delete: if isAdmin();
+    }
+
+    // --- Topic Requests Collection ---
+    match /topic_requests/{requestId} {
+      // Any authenticated user can submit a topic request/support message
+      allow create: if isAuthenticated();
+      // Only admins can view, update, or delete requests
+      allow read, update, delete: if isAdmin();
+    }
+
+    // --- System Config Settings ---
+    match /system/{settingId} {
+      // Any user (even unauthenticated) can read system settings, like checking maintenanceMode status
+      allow read: if true;
+      // Only admins can change system settings (maintenance mode, etc.)
+      allow write: if isAdmin();
+    }
+  }
+}
