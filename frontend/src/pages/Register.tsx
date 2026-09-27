@@ -109,7 +109,11 @@ export const Register: React.FC = () => {
       await loginWithGoogle();
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Google Sign-In failed.');
+      if (err.code === 'auth/unauthorized-domain') {
+        setError(`This domain (${window.location.hostname}) is not authorized in Firebase Console. Add "${window.location.hostname}" to Firebase Console -> Authentication -> Settings -> Authorized domains.`);
+      } else {
+        setError(err.message || 'Google Sign-In failed.');
+      }
     } finally {
       setLoading(false);
     }
