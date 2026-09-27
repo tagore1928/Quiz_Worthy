@@ -112,23 +112,24 @@ const getGenericFallbackQuestions = (topic: string, level: number): QuizQuestion
 };
 
 export const generateQuizQuestions = async (topic: string, level: number): Promise<QuizResponse> => {
-  const apiKey = process.env.GROQ_API_KEY;
+  try {
+    const apiKey = process.env.GROQ_API_KEY;
 
-  if (!apiKey || apiKey === 'your_groq_api_key' || apiKey.trim() === '') {
-    console.warn(`[GroqQuizService] No valid GROQ_API_KEY found. Serving fallback questions for topic "${topic}".`);
-    return {
-      topic,
-      level,
-      questions: getGenericFallbackQuestions(topic, level)
-    };
-  }
+    if (!apiKey || apiKey === 'your_groq_api_key' || apiKey.trim() === '') {
+      console.warn(`[GroqQuizService] No valid GROQ_API_KEY found. Serving fallback questions for topic "${topic}".`);
+      return {
+        topic,
+        level,
+        questions: getGenericFallbackQuestions(topic, level)
+      };
+    }
 
-  const groq = new Groq({ apiKey });
-  const levelText = level === 1 ? 'Easy' : level === 2 ? 'Medium' : 'Hard';
+    const groq = new Groq({ apiKey });
+    const levelText = level === 1 ? 'Easy' : level === 2 ? 'Medium' : 'Hard';
 
-  const systemPrompt = `You are a Senior Computer Science Educator and technical interviewer. Generate exactly 10 multiple-choice questions for a quiz on the specified topic and difficulty level. Output STRICT JSON only.`;
+    const systemPrompt = `You are a Senior Computer Science Educator and technical interviewer. Generate exactly 10 multiple-choice questions for a quiz on the specified topic and difficulty level. Output STRICT JSON only.`;
 
-  const userPrompt = `Generate a 10-question multiple choice quiz for the topic "${topic}" at level ${level} (${levelText}).
+    const userPrompt = `Generate a 10-question multiple choice quiz for the topic "${topic}" at level ${level} (${levelText}).
 Return ONLY a valid JSON object matching this schema:
 {
   "questions": [
@@ -148,47 +149,55 @@ Ensure:
 3. "correctAnswer" must match exactly one string in "options".
 4. "explanation" provides clear technical reasoning.`;
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      const completion = await groq.chat.completions.create({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        model: process.env.GROQ_MODEL || (attempt === 1 ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant'),
-        response_format: { type: 'json_object' },
-        temperature: 0.7,
-      });
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const completion = await groq.chat.completions.create({
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          model: process.env.GROQ_MODEL || (attempt === 1 ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant'),
+          response_format: { type: 'json_object' },
+          temperature: 0.7,
+        });
 
-      const content = completion.choices[0]?.message?.content;
-      if (content) {
-        const parsed = JSON.parse(content);
-        if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length >= 10) {
-          const formattedQuestions: QuizQuestion[] = parsed.questions.slice(0, 10).map((q: any, index: number) => ({
-            id: index + 1,
-            question: q.question || `Question ${index + 1}`,
-            options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
-            correctAnswer: q.correctAnswer || (q.options ? q.options[0] : 'Option A'),
-            explanation: q.explanation || 'Refer to fundamental computer science principles for details.'
-          }));
+        const content = completion.choices[0]?.message?.content;
+        if (content) {
+          const parsed = JSON.parse(content);
+          if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length >= 10) {
+            const formattedQuestions: QuizQuestion[] = parsed.questions.slice(0, 10).map((q: any, index: number) => ({
+              id: index + 1,
+              question: q.question || `Question ${index + 1}`,
+              options: Array.isArray(q.options) && q.options.length === 4 ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+              correctAnswer: q.correctAnswer || (q.options ? q.options[0] : 'Option A'),
+              explanation: q.explanation || 'Refer to fundamental computer science principles for details.'
+            }));
 
-          return {
-            topic,
-            level,
-            questions: formattedQuestions
-          };
+            return {
+              topic,
+              level,
+              questions: formattedQuestions
+            };
+          }
         }
+      } catch (err: any) {
+        console.warn(`[GroqQuizService] Attempt ${attempt} failed:`, err?.message || err);
       }
-    } catch (err: any) {
-      console.warn(`[GroqQuizService] Attempt ${attempt} failed:`, err?.message || err);
     }
-  }
 
-  // Fallback if AI generation fails
-  console.warn(`[GroqQuizService] AI generation failed after retries. Serving fallback questions for "${topic}".`);
-  return {
-    topic,
-    level,
-    questions: getGenericFallbackQuestions(topic, level)
-  };
+    // Fallback if AI generation fails
+    console.warn(`[GroqQuizService] AI generation failed after retries. Serving fallback questions for "${topic}".`);
+    return {
+      topic,
+      level,
+      questions: getGenericFallbackQuestions(topic, level)
+    };
+  } catch (globalErr) {
+    console.error(`[GroqQuizService] Critical error in generateQuizQuestions:`, globalErr);
+    return {
+      topic,
+      level,
+      questions: getGenericFallbackQuestions(topic, level)
+    };
+  }
 };
