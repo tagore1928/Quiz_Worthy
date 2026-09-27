@@ -11,11 +11,18 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g., mobile apps, curl, server-to-server) or matching localhost / CLIENT_URL
-    if (!origin || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:') || origin === process.env.CLIENT_URL) {
+    // Allow requests with no origin, localhost, vercel.app preview/production domains, or CLIENT_URL
+    if (
+      !origin ||
+      origin.startsWith('http://localhost:') ||
+      origin.startsWith('http://127.0.0.1:') ||
+      origin.endsWith('.vercel.app') ||
+      origin === 'https://quizworthy-nine.vercel.app' ||
+      origin === process.env.CLIENT_URL
+    ) {
       callback(null, true);
     } else {
-      callback(null, true); // Permissive for API consumers
+      callback(null, true); // Permissive for API clients
     }
   },
   credentials: true
