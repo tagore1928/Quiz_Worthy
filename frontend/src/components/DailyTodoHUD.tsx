@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getISTDateKey } from '../utils/dateUtils';
 import { db } from '../config/firebase';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, increment, setDoc, updateDoc } from 'firebase/firestore';
+import { markActiveToday } from '../utils/progress';
 import { BadgeCelebrationModal } from './BadgeCelebrationModal';
 import { 
   CheckSquare, 
@@ -23,7 +24,7 @@ interface TodoItem {
 }
 
 export const DailyTodoHUD: React.FC = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, refreshUserProfile } = useAuth();
   const istDateKey = getISTDateKey();
 
   const [todos, setTodos] = useState<TodoItem[]>([]);
@@ -111,14 +112,9 @@ export const DailyTodoHUD: React.FC = () => {
       setShowSilverModal(true);
 
       try {
-        const userRef = doc(db, 'users', userProfile.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const currentSilver = userSnap.data().silverBadges || 0;
-          await updateDoc(userRef, {
-            silverBadges: currentSilver + 1,
-          });
-        }
+        await updateDoc(doc(db, 'users', userProfile.uid), {
+          silverBadges: increment(1),
+        });
 
         const activityRef = doc(db, 'users', userProfile.uid, 'activity', istDateKey);
         await setDoc(
@@ -130,6 +126,9 @@ export const DailyTodoHUD: React.FC = () => {
           },
           { merge: true }
         );
+
+        await markActiveToday(userProfile.uid);
+        await refreshUserProfile();
       } catch (err) {
         console.error('Error updating Silver badge award in Firestore:', err);
       }

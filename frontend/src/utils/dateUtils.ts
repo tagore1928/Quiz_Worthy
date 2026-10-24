@@ -59,3 +59,10 @@ export const getHeatmapDaysForPastYear = (): HeatmapDay[] => {
 
   return days;
 };
+
+// Returns the IST date key `days` days before the given key (YYYY-MM-DD)
+export const shiftDateKey = (dateKey: string, days: number): string => {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const shifted = new Date(Date.UTC(y, m - 1, d - days));
+  return shifted.toISOString().slice(0, 10);
+};

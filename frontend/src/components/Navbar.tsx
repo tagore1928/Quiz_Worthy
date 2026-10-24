@@ -53,6 +53,11 @@ export const Navbar: React.FC = () => {
     }
   };
 
+  // No navigation during a quiz; the quiz page has its own exit control
+  if (location.pathname.startsWith('/quiz/')) {
+    return null;
+  }
+
   return (
     <>
       <nav className="sticky top-0 z-40 w-full bg-ink/75 backdrop-blur-xl border-b border-white/[0.06]">

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getHeatmapDaysForPastYear, getISTYear } from '../utils/dateUtils';
 import { db } from '../config/firebase';
-import { collection, getDocs, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { BadgeCelebrationModal } from './BadgeCelebrationModal';
 import { Award, Flame, Calendar } from 'lucide-react';
 
@@ -79,9 +79,8 @@ export const ActivityHeatmap: React.FC = () => {
         const goldBadgesAwarded = data.goldBadges50DayAwarded || false;
 
         if (!goldBadgesAwarded) {
-          const currentGold = data.goldBadges || 0;
           await updateDoc(userRef, {
-            goldBadges: currentGold + 1,
+            goldBadges: increment(1),
             goldBadges50DayAwarded: true,
           });
 

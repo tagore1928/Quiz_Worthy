@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { DEFAULT_TOPIC_LEVELS, PREDEFINED_COLLEGES } from '../types/user';
+import { saveCustomCollege, useCollegeOptions } from '../utils/colleges';
 import { DailyTodoHUD } from '../components/DailyTodoHUD';
 import { ActivityHeatmap } from '../components/ActivityHeatmap';
 import { db } from '../config/firebase';
@@ -54,7 +55,8 @@ export const Profile: React.FC = () => {
   const [customCollege, setCustomCollege] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState<boolean>(false);
   const [isNotStudent, setIsNotStudent] = useState<boolean>(!userProfile?.isStudent);
-  const [collegesList, setCollegesList] = useState<string[]>(PREDEFINED_COLLEGES);
+  // Includes the user's own college so a custom one can be shown as selected
+  const [collegesList, setCollegesList] = useCollegeOptions(userProfile?.collegeName);
 
   const [saving, setSaving] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<string>('');
@@ -113,6 +115,7 @@ export const Profile: React.FC = () => {
         collegeName: finalCollege,
         isStudent: !isNotStudent,
       });
+      if (!isNotStudent) await saveCustomCollege(finalCollege);
 
       await refreshUserProfile();
       setIsEditing(false);

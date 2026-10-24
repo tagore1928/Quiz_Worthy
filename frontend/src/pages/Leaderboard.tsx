@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types/user';
 import { db } from '../config/firebase';
+import { getEffectiveStreak } from '../utils/progress';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { 
   Trophy, 
@@ -32,7 +33,8 @@ export const Leaderboard: React.FC = () => {
 
       const list: UserProfile[] = [];
       snap.forEach((docSnap) => {
-        list.push(docSnap.data() as UserProfile);
+        const data = docSnap.data() as UserProfile;
+        list.push({ ...data, currentStreak: getEffectiveStreak(data) });
       });
 
       setUsers(list);

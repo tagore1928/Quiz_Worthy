@@ -19,22 +19,73 @@ service cloud.firestore {
     }
 
     // --- Users Collection & Subcollections ---
+    // The owner's email that is allowed to hold the admin role. Enforced here
+    // (server-side) so the role cannot be self-assigned from the browser.
+    function isAdminEmail() {
+      return request.auth.token.email == 'tagore1928@gmail.com';
+    }
+
+    // A new profile must start from zero progress and may only claim the admin
+    // role for the admin email.
+    function isValidNewProfile(userId) {
+      let p = request.resource.data;
+      return p.uid == userId
+        && p.xp == 0
+        && p.silverBadges == 0
+        && p.goldBadges == 0
+        && p.currentStreak == 0
+        && (p.role == 'user' || (p.role == 'admin' && isAdminEmail()));
+    }
+
+    // Changes a user may make to their own profile. Identity fields (uid, email,
+    // role, createdAt) are locked, and progress fields may only move the way the
+    // app moves them: XP up by at most one quiz (100), topic levels within 1-3,
+    // badges up by one, and the streak up by one per active day.
+    function isValidSelfUpdate() {
+      let before = resource.data;
+      let after = request.resource.data;
+      let changed = after.diff(before).affectedKeys();
+      return changed.hasOnly([
+          'name', 'collegeName', 'isStudent', 'xp', 'topicLevels',
+          'silverBadges', 'goldBadges', 'goldBadges50DayAwarded',
+          'currentStreak', 'lastActiveDate'
+        ])
+        && (!changed.hasAny(['name']) || (after.name is string && after.name.size() > 0 && after.name.size() <= 80))
+        && (!changed.hasAny(['collegeName']) || (after.collegeName is string && after.collegeName.size() <= 120))
+        && (!changed.hasAny(['xp']) || (after.xp is int && after.xp >= before.get('xp', 0) && after.xp <= before.get('xp', 0) + 100))
+        && (!changed.hasAny(['topicLevels']) || after.topicLevels.values().hasOnly([1, 2, 3]))
+        && (!changed.hasAny(['silverBadges']) || after.silverBadges == before.get('silverBadges', 0) + 1)
+        && (!changed.hasAny(['goldBadges', 'goldBadges50DayAwarded']) || (
+              after.goldBadges == before.get('goldBadges', 0) + 1
+              && after.goldBadges50DayAwarded == true
+              && before.get('goldBadges50DayAwarded', false) == false))
+        && (!changed.hasAny(['currentStreak']) || (
+              after.currentStreak is int && after.currentStreak >= 0
+              // the first streak update seeds the value from the activity history
+              && (after.currentStreak <= before.get('currentStreak', 0) + 1 || !('lastActiveDate' in before))))
+        && (!changed.hasAny(['lastActiveDate']) || after.lastActiveDate is string);
+    }
+
     match /users/{userId} {
       // Anyone logged in can read user profiles (needed for the leaderboard and profile lookups)
       allow read: if isAuthenticated();
-      
+
       // Users can create their own profile during registration/onboarding
-      allow create: if isOwner(userId);
-      
-      // Users can update their own profile; Admins can update any profile (e.g. role change or reset)
-      allow update: if isOwner(userId) || isAdmin();
-      
+      allow create: if isOwner(userId) && isValidNewProfile(userId);
+
+      // Users can make limited updates to their own profile; admins can update any profile (e.g. level reset)
+      allow update: if (isOwner(userId) && isValidSelfUpdate()) || isAdmin();
+
       // Only admins can delete profiles
       allow delete: if isAdmin();
 
-      // Subcollection for user quiz attempts
+      // Subcollection for user quiz attempts (append-only log)
       match /quiz_attempts/{attemptId} {
-        allow read, write: if isOwner(userId);
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.score is int
+          && request.resource.data.score >= 0
+          && request.resource.data.score <= 100;
       }
 
       // Subcollection for daily tasks
@@ -46,6 +97,20 @@ service cloud.firestore {
       match /activity/{activityId} {
         allow read, write: if isOwner(userId);
       }
+    }
+
+    // --- Colleges Collection ---
+    // Custom institution names typed in by users, shown in every college dropdown.
+    match /colleges/{collegeId} {
+      // Readable by anyone: the registration page loads the list before sign-in
+      allow read: if true;
+      // Signed-in users can add a new name; existing entries cannot be changed
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasOnly(['name', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 120;
+      allow update, delete: if isAdmin();
     }
 
     // --- Topics Collection ---

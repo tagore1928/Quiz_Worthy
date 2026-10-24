@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { PREDEFINED_COLLEGES } from '../types/user';
+import { useCollegeOptions } from '../utils/colleges';
 import { GraduationCap, UserCheck, Plus, AlertCircle } from 'lucide-react';
 
 export const GoogleOnboardingModal: React.FC = () => {
   const { pendingGoogleUser, completeGoogleOnboarding, cancelGoogleOnboarding } = useAuth();
 
-  const [collegesList, setCollegesList] = useState<string[]>(PREDEFINED_COLLEGES);
+  const [collegesList, setCollegesList] = useCollegeOptions();
   const [selectedCollege, setSelectedCollege] = useState<string>(PREDEFINED_COLLELESS_FALLBACK[0] || PREDEFINED_COLLEGES[0]);
   const [customCollege, setCustomCollege] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState<boolean>(false);

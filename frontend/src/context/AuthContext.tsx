@@ -10,6 +10,8 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../config/firebase';
+import { getEffectiveStreak } from '../utils/progress';
+import { saveCustomCollege } from '../utils/colleges';
 import { UserProfile, DEFAULT_TOPIC_LEVELS, UserRole } from '../types/user';
 
 const ADMIN_EMAIL = 'tagore1928@gmail.com';
@@ -51,7 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userRef = doc(db, 'users', uid);
       const docSnap = await getDoc(userRef);
       if (docSnap.exists()) {
-        return docSnap.data() as UserProfile;
+        const data = docSnap.data() as UserProfile;
+        return { ...data, currentStreak: getEffectiveStreak(data) };
       }
       return null;
     } catch (err) {
@@ -81,6 +84,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (profile) {
           setUserProfile(profile);
           setPendingGoogleUser(null);
+          // Backfill colleges entered before custom colleges were saved (no-op if present)
+          if (profile.isStudent) saveCustomCollege(profile.collegeName);
         } else if (isGoogleUser) {
           // Mandatory onboarding step for new Google user
           setPendingGoogleUser({
@@ -135,6 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     await setDoc(doc(db, 'users', user.uid), newProfile);
+    // Saved while still signed in, so the new college appears in everyone's dropdown
+    if (data.isStudent) await saveCustomCollege(data.collegeName);
 
     // Sign out immediately so user is required to verify before login
     await signOut(auth);
@@ -200,6 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     await setDoc(doc(db, 'users', pendingGoogleUser.uid), newProfile);
+    if (data.isStudent) await saveCustomCollege(data.collegeName);
     setUserProfile(newProfile);
     setPendingGoogleUser(null);
   };

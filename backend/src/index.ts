@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import quizRoutes from './routes/quizRoutes';
@@ -37,9 +37,21 @@ app.get(['/api/health', '/health'], (req: Request, res: Response) => {
   });
 });
 
-// Always listen on process.env.PORT for both Vercel Services and local development
-app.listen(PORT, () => {
-  console.log(`🚀 Quiz Worthy server running on port ${PORT}`);
+// Last-resort error handler so an unexpected error returns JSON instead of
+// leaving the serverless function in a broken state.
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+  console.error('Unhandled API error:', err);
+  if (!res.headersSent) {
+    res.status(500).json({ error: 'Unexpected server error. Please try again.' });
+  }
 });
+
+// On Vercel the platform serves the exported app; opening our own port there as
+// well conflicts with the runtime. Only listen when running locally.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Quiz Worthy server running on port ${PORT}`);
+  });
+}
 
 export default app;

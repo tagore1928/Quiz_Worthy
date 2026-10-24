@@ -25,6 +25,8 @@ export interface UserProfile {
   silverBadges: number;
   goldBadges: number;
   currentStreak: number;
+  // IST date (YYYY-MM-DD) of the last day with activity; drives streak calculation
+  lastActiveDate?: string;
   topicLevels: TopicLevels;
   createdAt: string;
 }

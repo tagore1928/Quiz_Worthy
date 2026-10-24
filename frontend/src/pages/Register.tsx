@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { PREDEFINED_COLLEGES } from '../types/user';
+import { useCollegeOptions } from '../utils/colleges';
 import { GraduationCap, Mail, Lock, User, Plus, AlertCircle, ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
   const { registerWithEmail, loginWithGoogle } = useAuth();
 
-  const [collegesList, setCollegesList] = useState<string[]>(PREDEFINED_COLLEGES);
+  const [collegesList, setCollegesList] = useCollegeOptions();
   const [selectedCollege, setSelectedCollege] = useState<string>(PREDEFINED_COLLEGES[0]);
   const [customCollege, setCustomCollege] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState<boolean>(false);

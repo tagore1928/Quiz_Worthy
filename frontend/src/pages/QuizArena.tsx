@@ -3,9 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { useAuth } from '../context/AuthContext';
 import { QuizQuestion, QuizResponse } from '../types/quiz';
-import { db } from '../config/firebase';
 import { Loader } from '../components/Loader';
-import { doc, updateDoc, collection, addDoc, setDoc, getDoc } from 'firebase/firestore';
+import { recordQuizResult } from '../utils/progress';
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -46,9 +45,30 @@ export const QuizArena: React.FC = () => {
   // 'offline' when the server served its curated bank because AI generation was unavailable
   const [questionSource, setQuestionSource] = useState<QuizResponse['source']>('ai');
 
+  const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
+
   useEffect(() => {
     fetchQuestions();
   }, [decodedTopic]);
+
+  // A session is in progress once questions are loaded and at least one is answered
+  const inProgress = questions.length > 0 && !quizFinished && (currentIndex > 0 || isAnswered);
+
+  // Warn before a reload or tab close throws away an unfinished session
+  useEffect(() => {
+    if (!inProgress) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [inProgress]);
+
+  const handleExit = () => {
+    if (inProgress) setShowExitConfirm(true);
+    else navigate('/');
+  };
 
   const fetchQuestions = async () => {
     try {
@@ -75,7 +95,12 @@ export const QuizArena: React.FC = () => {
       }
 
       setQuestions([]);
-      setError(data?.error || 'Could not load quiz questions. Please try again.');
+      setError(
+        data?.error ||
+          (response.ok
+            ? 'The quiz server returned no questions. Please try again.'
+            : `The quiz server is having trouble right now (error ${response.status}). Please try again in a moment.`)
+      );
     } catch (err: any) {
       console.warn('Quiz request failed:', err);
       setQuestions([]);
@@ -144,42 +169,16 @@ export const QuizArena: React.FC = () => {
       try {
         setSavingProgress(true);
 
-        const userRef = doc(db, 'users', userProfile.uid);
-        const userDocSnap = await getDoc(userRef);
+        await recordQuizResult(userProfile.uid, {
+          topic: decodedTopic,
+          score: totalScore,
+          percentage,
+          previousLevel: currentLevel,
+          newLevel: calculatedLevel,
+        });
 
-        if (userDocSnap.exists()) {
-          const currentXp = userDocSnap.data().xp || 0;
-
-          // Update XP & Topic Level
-          await updateDoc(userRef, {
-            xp: currentXp + totalScore,
-            [`topicLevels.${decodedTopic}`]: calculatedLevel,
-          });
-
-          // Log to quiz_attempts subcollection
-          const attemptsRef = collection(db, 'users', userProfile.uid, 'quiz_attempts');
-          await addDoc(attemptsRef, {
-            topic: decodedTopic,
-            score: totalScore,
-            percentage,
-            previousLevel: currentLevel,
-            newLevel: calculatedLevel,
-            timestamp: new Date().toISOString(),
-          });
-
-          // Log daily activity heatmap record
-          const todayDateStr = new Date().toISOString().split('T')[0];
-          const activityRef = doc(db, 'users', userProfile.uid, 'activity', todayDateStr);
-          await setDoc(activityRef, {
-            date: todayDateStr,
-            xpEarned: totalScore,
-            quizzesCompleted: 1,
-            timestamp: new Date().toISOString(),
-          }, { merge: true });
-
-          // Pull the updated XP / topic levels into the shared profile state
-          await refreshUserProfile();
-        }
+        // Pull the updated XP, levels and streak into the shared profile state
+        await refreshUserProfile();
       } catch (err) {
         console.error('Error saving quiz progress to Firestore:', err);
       } finally {
@@ -224,12 +223,13 @@ export const QuizArena: React.FC = () => {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link
-          to="/"
+        <button
+          type="button"
+          onClick={handleExit}
           className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-white transition"
         >
-          <ArrowLeft className="w-4 h-4" /> Dashboard
-        </Link>
+          <ArrowLeft className="w-4 h-4" /> Exit quiz
+        </button>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
           <span className="clean-badge whitespace-nowrap bg-sky-500/10 text-sky-300 border-sky-400/30">
@@ -351,6 +351,36 @@ export const QuizArena: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Exit confirmation */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-sm auth-glass-card p-6 space-y-4" role="dialog" aria-modal="true" aria-labelledby="exit-quiz-title">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-amber-400">Quiz in progress</p>
+            <h3 id="exit-quiz-title" className="text-lg font-semibold text-white">Leave this quiz?</h3>
+            <p className="text-sm text-slate-400">
+              You've answered {currentIndex + (isAnswered ? 1 : 0)} of {questions.length} questions. Leaving now
+              discards this session, and no XP or level change is saved.
+            </p>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 clean-button-primary"
+              >
+                Keep going
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="flex-1 py-2 rounded-lg border border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.04] text-sm transition"
+              >
+                Leave quiz
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary Completion Modal */}
       {quizFinished && (
