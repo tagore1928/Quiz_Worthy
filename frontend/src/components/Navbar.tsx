@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Home, 
-  User as UserIcon, 
-  BarChart3, 
-  Trophy, 
-  ShieldAlert, 
-  LogOut, 
-  Flame, 
-  Zap, 
-  Menu, 
-  X, 
-  BrainCircuit 
+import {
+  Home,
+  User as UserIcon,
+  BarChart3,
+  Trophy,
+  ShieldAlert,
+  LogOut,
+  Flame,
+  Zap,
+  Menu,
+  X
 } from 'lucide-react';
+import { BrandMark } from './BrandMark';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
@@ -23,6 +23,11 @@ export const Navbar: React.FC = () => {
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [loggingOut, setLoggingOut] = useState<boolean>(false);
+
+  // Close the mobile menu whenever the route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home },
@@ -50,37 +55,36 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-xl border-b border-slate-800">
+      <nav className="sticky top-0 z-40 w-full bg-ink/75 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            
+          <div className="flex items-center justify-between h-14">
+
             {/* Brand Logo */}
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-lg bg-sky-600 text-white flex items-center justify-center shadow-sm group-hover:bg-sky-500 transition">
-                <BrainCircuit className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-white">
+              <BrandMark className="w-7 h-7" />
+              <span className="text-[15px] font-semibold tracking-tight text-white">
                 Quiz Worthy
               </span>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-0.5 p-1 rounded-lg border border-white/[0.06] bg-white/[0.02]">
               {navLinks.map((link) => {
-                const Icon = link.icon;
                 const isActive = location.pathname === link.path;
                 return (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+                    className={`relative px-3 py-1 rounded-md text-[13px] transition-colors duration-150 ${
                       isActive
-                        ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-900'
+                        ? 'bg-white/[0.07] text-white'
+                        : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span>{link.name}</span>
+                    {isActive && (
+                      <span className="absolute left-1/2 -bottom-[5px] -translate-x-1/2 w-4 h-px bg-sky-400 shadow-[0_0_8px_rgba(200,241,53,0.9)]" />
+                    )}
+                    {link.name}
                   </Link>
                 );
               })}
@@ -88,55 +92,53 @@ export const Navbar: React.FC = () => {
 
             {/* User Profile & Actions */}
             {userProfile ? (
-              <div className="hidden md:flex items-center gap-3">
-                {/* Stats badge */}
-                <div className="flex items-center gap-3 px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs">
-                  <div className="flex items-center gap-1.5 text-amber-400 font-semibold" title="Current Streak">
-                    <Flame className="w-3.5 h-3.5 fill-amber-400" />
+              <div className="hidden md:flex items-center gap-2">
+                <div className="flex items-center gap-3 px-2.5 py-1 rounded-md border border-white/[0.06] font-mono text-xs">
+                  <div className="flex items-center gap-1 text-amber-400" title="Current Streak">
+                    <Flame className="w-3.5 h-3.5" />
                     <span>{userProfile.currentStreak}d</span>
                   </div>
-                  <div className="w-px h-3.5 bg-slate-800" />
-                  <div className="flex items-center gap-1.5 text-sky-400 font-semibold" title="Total XP">
-                    <Zap className="w-3.5 h-3.5 fill-sky-400" />
-                    <span>{userProfile.xp} XP</span>
+                  <div className="w-px h-3 bg-white/10" />
+                  <div className="flex items-center gap-1 text-sky-400" title="Total XP">
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>{userProfile.xp}</span>
                   </div>
                 </div>
 
-                {/* Avatar / Name */}
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 transition"
+                  className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-md border border-white/[0.06] hover:border-white/15 transition"
                 >
-                  <div className="w-6 h-6 rounded-md bg-sky-600 flex items-center justify-center text-white font-bold text-xs">
+                  <div className="w-6 h-6 rounded bg-slate-800 border border-white/10 flex items-center justify-center text-sky-400 font-mono font-semibold text-[11px]">
                     {userProfile.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-xs font-medium text-slate-200 max-w-[120px] truncate">
+                  <span className="text-xs text-slate-200 max-w-[120px] truncate">
                     {userProfile.name}
                   </span>
                 </Link>
 
-                {/* Logout Button */}
                 <button
                   onClick={() => setShowLogoutModal(true)}
-                  className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition"
+                  className="p-1.5 text-slate-400 hover:text-rose-400 rounded-md hover:bg-white/[0.04] transition"
                   title="Sign Out"
+                  aria-label="Sign out"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-2.5">
+              <div className="hidden md:flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-900 transition"
+                  className="px-3 py-1.5 rounded-md text-[13px] text-slate-300 hover:text-white transition"
                 >
-                  Sign In
+                  Sign in
                 </Link>
                 <Link
                   to="/register"
-                  className="px-3.5 py-1.5 rounded-lg text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 transition shadow-sm"
+                  className="px-3 py-1.5 rounded-md text-[13px] font-medium text-ink bg-sky-400 hover:bg-sky-300 transition"
                 >
-                  Register
+                  Get started
                 </Link>
               </div>
             )}
@@ -144,7 +146,8 @@ export const Navbar: React.FC = () => {
             {/* Mobile menu trigger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-slate-300 hover:text-white"
+              className="md:hidden p-2 -mr-2 text-slate-300 hover:text-white"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -153,18 +156,19 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-slate-950/95 border-b border-slate-800 px-4 pt-2 pb-5 space-y-2 animate-fade-in">
+          <div className="md:hidden border-t border-white/[0.06] px-4 pt-2 pb-4 space-y-1 animate-fade-in">
             {navLinks.map((link) => {
               const Icon = link.icon;
+              const isActive = location.pathname === link.path;
               return (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
-                    location.pathname === link.path
-                      ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
-                      : 'text-slate-300 hover:bg-slate-900'
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm border-l-2 ${
+                    isActive
+                      ? 'border-sky-400 bg-white/[0.05] text-white'
+                      : 'border-transparent text-slate-400 hover:text-white'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -179,10 +183,10 @@ export const Navbar: React.FC = () => {
                   setMobileMenuOpen(false);
                   setShowLogoutModal(true);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-400 bg-rose-500/10 border border-rose-500/20 mt-2"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-rose-400 border border-rose-500/20 mt-2"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Log Out</span>
+                <span>Log out</span>
               </button>
             )}
           </div>
@@ -191,32 +195,30 @@ export const Navbar: React.FC = () => {
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-sm auth-glass-card p-6 space-y-4 text-center">
-            <div className="inline-flex p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400">
-              <LogOut className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-white">Confirm Sign Out</h3>
-            <p className="text-xs text-slate-300">
-              Are you sure you want to sign out of your Quiz Worthy account?
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-sm auth-glass-card p-6 space-y-4">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-rose-400">Session</p>
+            <h3 className="text-lg font-semibold text-white">Sign out of Quiz Worthy?</h3>
+            <p className="text-sm text-slate-400">
+              You'll need to sign in again to continue practising.
             </p>
 
-            <div className="flex gap-2.5 pt-2">
+            <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 text-xs font-medium transition"
+                className="flex-1 py-2 rounded-md border border-white/10 text-slate-200 hover:bg-white/[0.04] text-sm transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleLogoutConfirm}
                 disabled={loggingOut}
-                className="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-sm transition flex items-center justify-center gap-1.5"
+                className="flex-1 py-2 rounded-md bg-rose-500 hover:bg-rose-400 text-white text-sm font-medium transition flex items-center justify-center gap-1.5"
               >
                 {loggingOut ? (
                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <span>Sign Out</span>
+                  <span>Sign out</span>
                 )}
               </button>
             </div>

@@ -9,6 +9,7 @@ export interface QuizQuestion {
 export interface QuizResponse {
   topic: string;
   level: number;
+  source?: 'ai' | 'offline';
   questions: QuizQuestion[];
 }
 

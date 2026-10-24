@@ -64,21 +64,19 @@ export const Leaderboard: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 relative">
       {/* Header */}
       <div className="clean-glass-card p-8 space-y-4 text-center">
-        <div className="inline-flex p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 mb-1">
-          <Trophy className="w-6 h-6" />
-        </div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Leaderboard</h1>
+        <span className="eyebrow">Rankings</span>
+        <h1 className="text-4xl font-semibold text-white">Leaderboard</h1>
         <p className="text-xs text-slate-400 max-w-lg mx-auto">
           Compare rankings across participants and view top performers in your institution.
         </p>
 
         {/* Tab Switcher */}
-        <div className="inline-flex p-1 bg-slate-950/60 border border-slate-800 rounded-lg gap-1">
+        <div className="inline-flex flex-wrap p-1 bg-white/[0.02] border border-white/[0.06] rounded-lg gap-1">
           <button
             onClick={() => setActiveTab('global')}
-            className={`px-4 py-2 rounded-md text-xs font-semibold transition flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-md text-xs font-medium transition-colors duration-150 flex items-center gap-2 cursor-pointer ${
               activeTab === 'global'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-white/[0.08] text-white'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -86,9 +84,9 @@ export const Leaderboard: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('college')}
-            className={`px-4 py-2 rounded-md text-xs font-semibold transition flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2 rounded-md text-xs font-medium transition-colors duration-150 flex items-center gap-2 cursor-pointer ${
               activeTab === 'college'
-                ? 'bg-sky-600 text-white shadow-sm'
+                ? 'bg-white/[0.08] text-white'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -113,7 +111,7 @@ export const Leaderboard: React.FC = () => {
               {/* 2nd Place */}
               {topThree[1] && (
                 <div className="clean-glass-card p-6 text-center space-y-2.5 order-2 md:order-1 border-slate-700">
-                  <div className="w-10 h-10 mx-auto rounded-lg bg-slate-800 border border-slate-600 text-slate-200 flex items-center justify-center font-bold text-sm">
+                  <div className="w-10 h-10 mx-auto rounded-lg border border-white/10 text-slate-200 flex items-center justify-center font-mono text-sm">
                     2
                   </div>
                   <h3 className="font-semibold text-white text-sm truncate">{topThree[1].name}</h3>
@@ -124,8 +122,8 @@ export const Leaderboard: React.FC = () => {
 
               {/* 1st Place */}
               {topThree[0] && (
-                <div className="clean-glass-card p-7 text-center space-y-3 order-1 md:order-2 border-amber-500/40 bg-amber-500/5">
-                  <div className="w-12 h-12 mx-auto rounded-xl bg-amber-500/20 border border-amber-400 text-amber-300 flex items-center justify-center font-bold text-lg shadow-sm">
+                <div className="clean-glass-card p-7 text-center space-y-3 order-1 md:order-2 border-sky-400/40 shadow-[0_0_60px_-25px_rgba(200,241,53,0.6)] md:-translate-y-3">
+                  <div className="w-12 h-12 mx-auto rounded-lg bg-sky-400 text-ink flex items-center justify-center font-mono font-semibold text-lg">
                     1
                   </div>
                   <div className="space-y-0.5">
@@ -139,7 +137,7 @@ export const Leaderboard: React.FC = () => {
               {/* 3rd Place */}
               {topThree[2] && (
                 <div className="clean-glass-card p-6 text-center space-y-2.5 order-3 md:order-3 border-slate-700">
-                  <div className="w-10 h-10 mx-auto rounded-lg bg-slate-800 border border-slate-600 text-slate-300 flex items-center justify-center font-bold text-sm">
+                  <div className="w-10 h-10 mx-auto rounded-lg border border-white/10 text-slate-300 flex items-center justify-center font-mono text-sm">
                     3
                   </div>
                   <h3 className="font-semibold text-white text-sm truncate">{topThree[2].name}</h3>
@@ -185,7 +183,7 @@ export const Leaderboard: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-white">{user.name}</span>
                             {isSelf && (
-                              <span className="px-1.5 py-0.2 rounded text-[10px] bg-sky-600 text-white font-semibold">
+                              <span className="px-1.5 py-0.5 rounded font-mono text-[10px] uppercase bg-sky-400 text-ink font-semibold">
                                 YOU
                               </span>
                             )}
@@ -225,7 +223,7 @@ export const Leaderboard: React.FC = () => {
       {userRank && (
         <div className="sticky bottom-4 z-40 max-w-4xl mx-auto auth-glass-card p-3.5 flex items-center justify-between gap-4 border border-sky-500/40 shadow-xl">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md bg-sky-600 text-white font-bold text-sm flex items-center justify-center">
+            <div className="w-8 h-8 rounded-md bg-sky-400 text-ink font-mono font-semibold text-sm flex items-center justify-center">
               #{userRank}
             </div>
             <div>

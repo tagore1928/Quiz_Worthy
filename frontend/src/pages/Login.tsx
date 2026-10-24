@@ -84,13 +84,12 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-md auth-glass-card p-8 space-y-6">
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 py-16">
+      <div className="w-full max-w-md auth-glass-card p-8 sm:p-10 space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            Welcome Back
-          </h1>
+        <div className="space-y-3">
+          <span className="eyebrow">Sign in</span>
+          <h1 className="text-3xl font-semibold text-white">Welcome back</h1>
           <p className="text-slate-400 text-sm">
             Sign in to your Quiz Worthy account to continue practice
           </p>
@@ -171,11 +170,12 @@ export const Login: React.FC = () => {
           <span>Sign in with Google</span>
         </button>
 
-        <div className="relative flex items-center justify-center">
-          <div className="border-t border-slate-800 w-full" />
-          <span className="bg-slate-900 px-3 text-xs text-slate-400">
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/10" />
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-slate-500 whitespace-nowrap">
             or continue with email
           </span>
+          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/10" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -242,9 +242,9 @@ export const Login: React.FC = () => {
           </button>
         </form>
 
-        <p className="text-center text-sm text-slate-400">
+        <p className="text-sm text-slate-500 pt-2 border-t border-white/[0.06]">
           Don't have an account yet?{' '}
-          <Link to="/register" className="text-sky-400 hover:text-sky-300 font-medium">
+          <Link to="/register" className="text-sky-400 hover:text-sky-300 font-medium transition">
             Create Account
           </Link>
         </p>

@@ -155,7 +155,7 @@ export const DailyTodoHUD: React.FC = () => {
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
               <CheckSquare className="w-5 h-5 text-sky-400" />
-              <h2 className="text-lg font-bold text-white">Daily Tasks</h2>
+              <h2 className="text-lg font-semibold text-white">Daily Tasks</h2>
             </div>
             <p className="text-xs text-slate-400">
               Complete your daily learning checklist to earn a{' '}
@@ -180,9 +180,9 @@ export const DailyTodoHUD: React.FC = () => {
                 {Math.round(progressPercent)}%
               </span>
             </div>
-            <div className="w-full h-2 bg-slate-800 rounded-md overflow-hidden border border-slate-700/60">
+            <div className="meter-track">
               <div
-                className="h-full bg-sky-500 transition-all duration-200"
+                className="meter-fill"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -224,7 +224,7 @@ export const DailyTodoHUD: React.FC = () => {
           <button
             type="submit"
             disabled={todos.length >= 10 || !newTaskText.trim()}
-            className="px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs rounded-lg transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="px-3.5 py-2 bg-sky-400 hover:bg-sky-300 text-ink font-medium text-xs rounded-lg transition flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Add
           </button>

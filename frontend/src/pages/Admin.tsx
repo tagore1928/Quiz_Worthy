@@ -183,7 +183,7 @@ export const Admin: React.FC = () => {
     return (
       <div className="max-w-md mx-auto my-20 p-8 cyber-glass-box text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
-        <h2 className="text-2xl font-black text-white">Access Restricted</h2>
+        <h2 className="text-2xl font-semibold text-white">Access Restricted</h2>
         <p className="text-xs text-slate-300">
           Administrator privileges are required to access the Quiz Worthy Control Panel.
         </p>
@@ -203,10 +203,10 @@ export const Admin: React.FC = () => {
       {/* Header */}
       <div className="neo-glass-card p-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-magenta/10 border border-cyber-magenta/30 text-cyber-magenta text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-cyber-magenta/10 border border-cyber-magenta/30 text-cyber-magenta text-xs font-bold uppercase tracking-wider">
             <ShieldCheck className="w-4 h-4" /> Administrative Control Panel
           </div>
-          <h1 className="text-3xl font-extrabold text-white">System Operations & Maintenance</h1>
+          <h1 className="text-3xl font-semibold text-white">System Operations & Maintenance</h1>
           <p className="text-xs text-slate-300">
             Logged in as Super Administrator (<span className="text-cyber-cyan font-bold">{userProfile.email}</span>)
           </p>
@@ -265,7 +265,7 @@ export const Admin: React.FC = () => {
         </div>
 
         <div className="neo-glass-card p-6 flex items-center gap-4">
-          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
+          <div className="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400">
             <BarChart3 className="w-8 h-8" />
           </div>
           <div>
@@ -279,7 +279,7 @@ export const Admin: React.FC = () => {
       <div className="neo-glass-card p-6 sm:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h2 className="text-xl font-black text-white flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
               <Users className="w-5 h-5 text-cyber-cyan" /> User Management
             </h2>
             <p className="text-xs text-slate-400">Inspect user profiles and reset difficulty levels.</p>
@@ -340,7 +340,7 @@ export const Admin: React.FC = () => {
         {/* Dynamic Topic Manager */}
         <div className="neo-glass-card p-6 sm:p-8 space-y-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-black text-white flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-cyber-cyan" /> Dynamic Topic Manager
             </h2>
             <p className="text-xs text-slate-400">Add custom quiz topics to display on the Home page.</p>
@@ -397,7 +397,7 @@ export const Admin: React.FC = () => {
         {/* Topic Requests Feed */}
         <div className="neo-glass-card p-6 sm:p-8 space-y-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-black text-white flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-cyber-magenta" /> Topic Requests Feed
             </h2>
             <p className="text-xs text-slate-400">User suggestions submitted via Contact Support.</p>

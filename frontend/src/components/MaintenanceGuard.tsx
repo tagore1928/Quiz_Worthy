@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { Loader } from './Loader';
 
 export const MaintenanceGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { userProfile, loading } = useAuth();
@@ -18,7 +19,8 @@ export const MaintenanceGuard: React.FC<{ children: React.ReactNode }> = ({ chil
       (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setIsMaintenance(!!data.isMaintenanceMode);
+          // Admin panel writes `maintenanceMode`; `isMaintenanceMode` is the legacy field name
+          setIsMaintenance(!!(data.maintenanceMode ?? data.isMaintenanceMode));
         } else {
           setIsMaintenance(false);
         }
@@ -36,9 +38,7 @@ export const MaintenanceGuard: React.FC<{ children: React.ReactNode }> = ({ chil
 
   if (loading || checking) {
     return (
-      <div className="min-h-screen bg-[#0b0f19] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
-      </div>
+      <Loader />
     );
   }
 

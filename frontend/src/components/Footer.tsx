@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BrainCircuit, HelpCircle, X, Send, CheckCircle2 } from 'lucide-react';
+import { HelpCircle, X, Send, CheckCircle2 } from 'lucide-react';
+import { BrandMark } from './BrandMark';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -54,27 +55,27 @@ export const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md text-slate-400 text-xs py-8">
+      <footer className="mt-auto border-t border-white/[0.06] bg-ink/80 text-slate-500 text-xs py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4 text-sky-400" />
-            <span className="font-semibold text-white">Quiz Worthy</span>
-            <span className="text-slate-500">© 2026. Practice real technical interview questions.</span>
+          <div className="flex items-center gap-2.5">
+            <BrandMark className="w-5 h-5" />
+            <span className="font-medium text-slate-200">Quiz Worthy</span>
+            <span className="font-mono text-[11px] text-slate-500">© 2026</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 text-slate-400">
-            <Link to="/about" className="hover:text-slate-200 transition">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            <Link to="/about" className="hover:text-white transition">
               About
             </Link>
-            <Link to="/privacy" className="hover:text-slate-200 transition">
-              Privacy Policy
+            <Link to="/privacy" className="hover:text-white transition">
+              Privacy
             </Link>
-            <Link to="/terms" className="hover:text-slate-200 transition">
-              Terms of Service
+            <Link to="/terms" className="hover:text-white transition">
+              Terms
             </Link>
             <button
               onClick={() => setIsSupportOpen(true)}
-              className="text-sky-400 hover:text-sky-300 font-medium cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 cursor-pointer transition"
             >
               Contact Support
             </button>
@@ -84,11 +85,12 @@ export const Footer: React.FC = () => {
 
       {/* Contact Support Modal */}
       {isSupportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-md auth-glass-card p-6 space-y-4 relative">
             <button
               onClick={() => setIsSupportOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              aria-label="Close"
             >
               <X className="w-4 h-4" />
             </button>

@@ -113,7 +113,7 @@ export const ActivityHeatmap: React.FC = () => {
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-sky-400" />
-              <h2 className="text-lg font-bold text-white">Activity Calendar</h2>
+              <h2 className="text-lg font-semibold text-white">Activity Calendar</h2>
             </div>
             <p className="text-xs text-slate-400">
               Annual activity tracking. Take quizzes or complete daily tasks to stay active.
@@ -140,9 +140,9 @@ export const ActivityHeatmap: React.FC = () => {
             </span>
           </div>
 
-          <div className="w-full h-2 bg-slate-800 rounded-md overflow-hidden border border-slate-700/60">
+          <div className="meter-track">
             <div
-              className="h-full bg-amber-400 rounded-md transition-all duration-300"
+              className="h-full rounded-[2px] bg-amber-400 shadow-[0_0_12px_rgba(255,148,71,0.5)] transition-all duration-500"
               style={{ width: `${goldProgressPercent}%` }}
             />
           </div>
@@ -161,7 +161,7 @@ export const ActivityHeatmap: React.FC = () => {
               <span className="text-slate-500">Less</span>
               <span className="w-2.5 h-2.5 rounded-sm bg-slate-800 border border-slate-700" />
               <span className="w-2.5 h-2.5 rounded-sm bg-sky-500/50 border border-sky-400/50" />
-              <span className="w-2.5 h-2.5 rounded-sm bg-sky-500 border border-sky-400" />
+              <span className="w-2.5 h-2.5 rounded-[2px] bg-sky-400" />
               <span className="text-slate-500">More</span>
             </div>
           </div>
@@ -180,10 +180,10 @@ export const ActivityHeatmap: React.FC = () => {
                     <div
                       key={day.dateKey}
                       title={`${day.displayDate}: ${active ? 'Active (Quiz/To-Do Completed)' : 'No activity'}`}
-                      className={`w-3 h-3 rounded-sm transition-all duration-150 cursor-pointer ${
+                      className={`w-3 h-3 rounded-[2px] transition-colors duration-150 cursor-pointer ${
                         active
-                          ? 'bg-sky-500 border border-sky-400'
-                          : 'bg-slate-900 border border-slate-800 hover:border-slate-600'
+                          ? 'bg-sky-400 shadow-[0_0_6px_rgba(200,241,53,0.45)]'
+                          : 'bg-white/[0.04] hover:bg-white/15'
                       }`}
                     />
                   );

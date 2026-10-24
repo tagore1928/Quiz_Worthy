@@ -21,14 +21,14 @@ export const BadgeCelebrationModal: React.FC<BadgeCelebrationModalProps> = ({
         confetti({
           particleCount: 120,
           spread: 80,
-          colors: ['#f59e0b', '#38bdf8', '#ffffff'],
+          colors: ['#ff9447', '#c8f135', '#ffffff'],
           origin: { y: 0.5 },
         });
       } else {
         confetti({
           particleCount: 80,
           spread: 60,
-          colors: ['#94a3b8', '#38bdf8', '#ffffff'],
+          colors: ['#cdd1ce', '#c8f135', '#ffffff'],
           origin: { y: 0.6 },
         });
       }
@@ -45,11 +45,12 @@ export const BadgeCelebrationModal: React.FC<BadgeCelebrationModalProps> = ({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-white"
+          aria-label="Close"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className={`inline-flex p-3 rounded-xl ${isGold ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-200 border border-slate-700'}`}>
+        <div className={`inline-flex p-3 rounded-lg ${isGold ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-200 border border-slate-700'}`}>
           {isGold ? (
             <Award className="w-10 h-10" />
           ) : (
@@ -58,11 +59,11 @@ export const BadgeCelebrationModal: React.FC<BadgeCelebrationModalProps> = ({
         </div>
 
         <div className="space-y-1.5">
-          <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold ${isGold ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-300 border border-slate-700'}`}>
+          <div className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-md text-xs font-semibold ${isGold ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-300 border border-slate-700'}`}>
             <span>{isGold ? 'Gold Badge Unlocked' : 'Silver Badge Unlocked'}</span>
           </div>
 
-          <h2 className="text-xl font-bold text-white">{title}</h2>
+          <h2 className="text-2xl font-semibold text-white">{title}</h2>
           <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
             {description}
           </p>

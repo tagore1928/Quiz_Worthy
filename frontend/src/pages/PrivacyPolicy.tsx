@@ -7,7 +7,7 @@ export const PrivacyPolicy: React.FC = () => {
       <div className="clean-glass-card p-8 space-y-4">
         <div className="flex items-center gap-2.5">
           <ShieldCheck className="w-6 h-6 text-sky-400" />
-          <h1 className="text-2xl font-bold text-white">Privacy Policy</h1>
+          <h1 className="text-2xl font-semibold text-white">Privacy Policy</h1>
         </div>
         <p className="text-xs text-slate-400">Last updated: August 2026</p>
         <div className="space-y-4 text-slate-300 text-xs sm:text-sm leading-relaxed border-t border-slate-800 pt-4">

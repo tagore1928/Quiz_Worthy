@@ -5,12 +5,13 @@ export const Maintenance: React.FC = () => {
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4">
       <div className="w-full max-w-lg auth-glass-card p-10 text-center space-y-6">
-        <div className="inline-flex p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+        <div className="inline-flex p-3 rounded-lg border border-amber-400/30 text-amber-400">
           <Wrench className="w-8 h-8" />
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">System Under Maintenance</h1>
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-amber-400">Status: maintenance</p>
+          <h1 className="text-3xl font-semibold text-white">We'll be back shortly</h1>
           <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
             Quiz Worthy is currently undergoing scheduled platform maintenance. Services will resume shortly.
           </p>

@@ -120,13 +120,12 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-lg auth-glass-card p-8 space-y-6">
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 py-16">
+      <div className="w-full max-w-lg auth-glass-card p-8 sm:p-10 space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            Create Your Account
-          </h1>
+        <div className="space-y-3">
+          <span className="eyebrow">Create account</span>
+          <h1 className="text-3xl font-semibold text-white">Start practising</h1>
           <p className="text-slate-400 text-sm">
             Practice real technical interview questions and track topic mastery
           </p>
@@ -167,11 +166,12 @@ export const Register: React.FC = () => {
           <span>Continue with Google</span>
         </button>
 
-        <div className="relative flex items-center justify-center">
-          <div className="border-t border-slate-800 w-full" />
-          <span className="bg-slate-900 px-3 text-xs text-slate-400">
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/10" />
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-slate-500 whitespace-nowrap">
             or continue with email
           </span>
+          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/10" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -328,7 +328,7 @@ export const Register: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleAddCustomCollege}
-                      className="px-3.5 py-2 bg-sky-600 text-white font-medium rounded-lg hover:bg-sky-500 transition flex items-center gap-1 text-xs"
+                      className="px-3.5 py-2 bg-sky-400 text-ink font-medium rounded-lg hover:bg-sky-300 transition flex items-center gap-1 text-xs"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Add</span>
@@ -363,9 +363,9 @@ export const Register: React.FC = () => {
         </form>
 
         {/* Footer Link */}
-        <p className="text-center text-sm text-slate-400">
+        <p className="text-sm text-slate-500 pt-2 border-t border-white/[0.06]">
           Already have an account?{' '}
-          <Link to="/login" className="text-sky-400 hover:text-sky-300 font-medium">
+          <Link to="/login" className="text-sky-400 hover:text-sky-300 font-medium transition">
             Sign In
           </Link>
         </p>

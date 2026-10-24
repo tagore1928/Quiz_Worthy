@@ -71,7 +71,7 @@ export const GoogleOnboardingModal: React.FC = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
       <div className="w-full max-w-lg auth-glass-card p-8 space-y-6">
         <div className="text-center space-y-1.5">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-semibold text-white">
             Complete Your Profile
           </h2>
           <p className="text-slate-400 text-xs">
@@ -152,7 +152,7 @@ export const GoogleOnboardingModal: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleAddCustomCollege}
-                      className="px-3.5 py-2 bg-sky-600 text-white font-medium text-xs rounded-lg hover:bg-sky-500 transition"
+                      className="px-3.5 py-2 bg-sky-400 hover:bg-sky-300 text-ink font-medium text-xs rounded-lg transition"
                     >
                       <Plus className="w-4 h-4" />
                     </button>

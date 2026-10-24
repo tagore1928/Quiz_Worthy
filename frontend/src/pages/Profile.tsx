@@ -159,14 +159,14 @@ export const Profile: React.FC = () => {
       <div className="clean-glass-card p-8 relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="w-20 h-20 rounded-xl bg-sky-600 flex items-center justify-center text-white font-bold text-3xl shadow-sm flex-shrink-0">
+            <div className="w-20 h-20 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-sky-400 font-mono font-semibold text-3xl flex-shrink-0">
               {userProfile.name.charAt(0).toUpperCase()}
             </div>
 
             {!isEditing ? (
               <div className="space-y-3 text-center md:text-left">
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                  <h1 className="text-2xl font-bold text-white">{userProfile.name}</h1>
+                  <h1 className="text-3xl font-semibold text-white">{userProfile.name}</h1>
                   <span
                     className={`clean-badge ${
                       userProfile.role === 'admin'
@@ -261,7 +261,7 @@ export const Profile: React.FC = () => {
                           <button
                             type="button"
                             onClick={handleAddCustomCollege}
-                            className="px-3.5 py-2 bg-sky-600 text-white font-medium text-xs rounded-lg hover:bg-sky-500 transition"
+                            className="px-3.5 py-2 bg-sky-400 hover:bg-sky-300 text-ink font-medium text-xs rounded-lg transition"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -357,7 +357,7 @@ export const Profile: React.FC = () => {
       {/* Topic Mastery Level Grid */}
       <div className="clean-glass-card p-6 sm:p-8 space-y-6">
         <div className="space-y-1">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <Shield className="w-4 h-4 text-sky-400" /> Topic Mastery Levels
           </h2>
           <p className="text-xs text-slate-400">
@@ -395,7 +395,7 @@ export const Profile: React.FC = () => {
                   </div>
                   <div className="w-full h-1.5 bg-slate-800 rounded-md overflow-hidden">
                     <div
-                      className="h-full bg-sky-500 rounded-md transition-all duration-300"
+                      className="meter-fill"
                       style={{ width: `${(level / 3) * 100}%` }}
                     />
                   </div>

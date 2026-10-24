@@ -1,10 +1,12 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { GoogleOnboardingModal } from './components/GoogleOnboardingModal';
 import { MaintenanceGuard } from './components/MaintenanceGuard';
+import { Backdrop } from './components/Backdrop';
+import { Loader } from './components/Loader';
 
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -19,15 +21,22 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
 import { QuizArena } from './pages/QuizArena';
 
+// Reset scroll position on every route change (in-page #hash links excepted).
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
 // Protected Route Guard with First-Time Visitor routing
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b0f19] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
-      </div>
+      <Loader />
     );
   }
 
@@ -49,9 +58,7 @@ const RootRoute: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0b0f19] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
-      </div>
+      <Loader />
     );
   }
 
@@ -72,7 +79,9 @@ export const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100 selection:bg-sky-500/30 selection:text-white font-sans">
+        <ScrollToTop />
+        <Backdrop />
+        <div className="relative z-10 min-h-screen flex flex-col text-slate-100 font-sans">
           <Navbar />
           
           <main className="flex-grow">

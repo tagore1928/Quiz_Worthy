@@ -5,67 +5,192 @@
 @layer base {
   :root {
     color-scheme: dark;
-  }
-  
-  body {
-    background-color: #0b0f19;
-    background-image: 
-      radial-gradient(at 10% 10%, rgba(14, 165, 233, 0.05) 0px, transparent 40%),
-      radial-gradient(at 90% 90%, rgba(2, 132, 199, 0.05) 0px, transparent 40%),
-      radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.5) 0px, transparent 100%);
-    background-attachment: fixed;
-    color: #f8fafc;
-    overflow-x: hidden;
+    --ink: #070908;
+    --signal: #c8f135;
+    --hairline: rgba(255, 255, 255, 0.07);
+    --tick: rgba(255, 255, 255, 0.28);
   }
 
-  /* Clean subtle scrollbar */
+  body {
+    background-color: var(--ink);
+    color: #e6e8e6;
+    overflow-x: hidden;
+    font-feature-settings: 'ss01', 'tnum';
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.025em;
+  }
+
+  h1 {
+    letter-spacing: -0.04em;
+  }
+
+  ::selection {
+    background: rgba(200, 241, 53, 0.85);
+    color: #070908;
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--signal);
+    outline-offset: 2px;
+  }
+
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: #0b0f19;
+    background: var(--ink);
   }
   ::-webkit-scrollbar-thumb {
-    background: #1e293b;
-    border-radius: 3px;
+    background: #1e2220;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #2f3431;
+  }
+
+  select option {
+    background: #0d100f;
+    color: #e6e8e6;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
   }
 }
 
-@layer utilities {
-  /* Authentic Clean Glassmorphism */
+/* Shared building blocks. Kept in the components layer so page-level utilities
+   (padding, colours, positioning) can still override them. */
+@layer components {
+  /* Primary panel used for heroes, auth forms and modals: square-ish frame with
+     crosshair ticks at each corner. */
   .auth-glass-card {
-    @apply backdrop-blur-xl bg-slate-900/80 border border-slate-800/90 shadow-2xl rounded-2xl relative;
-  }
-
-  .clean-input {
-    @apply w-full px-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all duration-200 text-sm;
-  }
-
-  .clean-button-primary {
-    @apply w-full py-2.5 px-4 rounded-lg font-semibold text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 text-sm;
-  }
-
-  .clean-button-secondary {
-    @apply w-full py-2.5 px-4 rounded-lg font-medium text-slate-200 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 transition-all duration-200 flex items-center justify-center gap-2.5 text-sm cursor-pointer;
+    @apply relative backdrop-blur-xl;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    background-color: rgba(13, 16, 15, 0.95);
+    background-image:
+      linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)),
+      linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)),
+      linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)),
+      linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick));
+    background-size:
+      12px 1px, 1px 12px, 12px 1px, 1px 12px,
+      12px 1px, 1px 12px, 12px 1px, 1px 12px;
+    background-position:
+      top left, top left, top right, top right,
+      bottom left, bottom left, bottom right, bottom right;
+    background-repeat: no-repeat;
+    background-origin: border-box;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 30px 80px -40px rgba(0, 0, 0, 0.9);
   }
 
   .clean-glass-card {
-    @apply bg-slate-900/50 backdrop-blur-md border border-slate-800/80 rounded-xl transition-all duration-200;
+    @apply transition-colors duration-200;
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    background-color: rgba(13, 16, 15, 0.96);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
 
-  .clean-glass-card-hover {
-    @apply hover:border-slate-700 hover:bg-slate-900/70 hover:shadow-lg;
+  .clean-glass-card-hover:hover {
+    border-color: rgba(200, 241, 53, 0.28);
+    background-color: rgba(17, 21, 19, 0.98);
+  }
+
+  .clean-input {
+    @apply w-full px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors duration-150 focus:outline-none;
+    background: #0a0c0b;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+  }
+  .clean-input:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  .clean-input:focus {
+    border-color: rgba(200, 241, 53, 0.6);
+    box-shadow: 0 0 0 3px rgba(200, 241, 53, 0.1);
+  }
+
+  .clean-button-primary {
+    @apply w-full py-2.5 px-4 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
+    color: #070908;
+    background: var(--signal);
+    border-radius: 8px;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+  .clean-button-primary:not(:disabled):hover {
+    background: #d5f75a;
+    box-shadow:
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 0 24px -6px rgba(200, 241, 53, 0.55);
+  }
+  .clean-button-primary:not(:disabled):active {
+    transform: translateY(1px);
+  }
+
+  .clean-button-secondary {
+    @apply w-full py-2.5 px-4 text-sm font-medium text-slate-100 flex items-center justify-center gap-2.5 cursor-pointer transition-colors duration-150;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+  }
+  .clean-button-secondary:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 
   .clean-badge {
-    @apply px-2.5 py-0.5 rounded-md text-xs font-medium border;
+    @apply px-2 py-0.5 font-mono text-[10.5px] font-medium uppercase tracking-wider border;
+    border-radius: 4px;
   }
 
-  /* Backwards compatibility aliases mapped to clean designs */
+  /* Small uppercase mono label with a signal square, used above headings. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--signal);
+    box-shadow: 0 0 10px rgba(200, 241, 53, 0.7);
+  }
+
+  .meter-track {
+    @apply w-full h-1.5 overflow-hidden;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+  }
+  .meter-fill {
+    @apply h-full transition-all duration-500;
+    background: var(--signal);
+    border-radius: 2px;
+    box-shadow: 0 0 12px rgba(200, 241, 53, 0.5);
+  }
+
+  .stat-chip {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-xs text-slate-200;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+  }
+
+  /* Legacy aliases */
   .cyber-glass-box {
     @apply auth-glass-card;
   }

@@ -5,10 +5,10 @@ export const AboutUs: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       <div className="clean-glass-card p-8 space-y-4 text-center">
-        <div className="inline-flex p-2.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 mb-1">
+        <div className="inline-flex p-2.5 rounded-lg border border-white/10 text-sky-400 mb-1">
           <BrainCircuit className="w-7 h-7" />
         </div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">About Quiz Worthy</h1>
+        <h1 className="text-4xl font-semibold text-white">About Quiz Worthy</h1>
         <p className="text-slate-300 max-w-2xl mx-auto text-xs sm:text-sm leading-relaxed">
           Quiz Worthy is a technical assessment platform designed to practice real technical interview questions and validate knowledge across core Computer Science topics.
         </p>

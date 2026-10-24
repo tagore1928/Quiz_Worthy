@@ -83,14 +83,15 @@ export const Analytics: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Page Title Header */}
-      <div className="clean-glass-card p-8 space-y-2">
-        <div className="flex items-center gap-2.5">
-          <BarChart3 className="w-7 h-7 text-sky-400" />
-          <h1 className="text-2xl font-bold text-white">Performance Analytics</h1>
+      <div className="clean-glass-card p-8 flex items-start justify-between gap-6">
+        <div className="space-y-3">
+          <span className="eyebrow">Analytics</span>
+          <h1 className="text-3xl font-semibold text-white">Performance</h1>
+          <p className="text-sm text-slate-400">
+            Review your topic mastery distribution, historical score trends, and past practice sessions.
+          </p>
         </div>
-        <p className="text-xs text-slate-400">
-          Review your topic mastery distribution, historical score trends, and past practice sessions.
-        </p>
+        <BarChart3 className="hidden sm:block w-6 h-6 text-slate-600 flex-shrink-0" />
       </div>
 
       {/* Visual Charts Grid */}
@@ -112,15 +113,21 @@ export const Analytics: React.FC = () => {
           <div className="h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
+                <defs>
+                  <radialGradient id="radarDream">
+                    <stop offset="0%" stopColor="#c8f135" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#c8f135" stopOpacity={0.12} />
+                  </radialGradient>
+                </defs>
                 <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#38bdf8', fontSize: 11 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 3]} tick={{ fill: '#94a3b8', fontSize: 10 }} />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#cdd1ce', fontSize: 11, fontFamily: 'Geist Mono' }} />
+                <PolarRadiusAxis angle={30} domain={[0, 3]} tick={{ fill: '#9a93b8', fontSize: 10 }} />
                 <Radar
                   name="Mastery Level"
                   dataKey="level"
-                  stroke="#0284c7"
-                  fill="#0ea5e9"
-                  fillOpacity={0.25}
+                  stroke="#c8f135"
+                  fill="url(#radarDream)"
+                  fillOpacity={0.6}
                 />
               </RadarChart>
             </ResponsiveContainer>
@@ -150,19 +157,23 @@ export const Analytics: React.FC = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={areaChartData}>
                   <defs>
+                    <linearGradient id="scoreStroke" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#c8f135" />
+                      <stop offset="100%" stopColor="#c8f135" />
+                    </linearGradient>
                     <linearGradient id="scoreGlow" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0284c7" stopOpacity={0.5} />
-                      <stop offset="95%" stopColor="#0284c7" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#c8f135" stopOpacity={0.28} />
+                      <stop offset="95%" stopColor="#c8f135" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                  <XAxis dataKey="attemptNum" tick={{ fill: '#94a3b8', fontSize: 10 }} />
-                  <YAxis domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 10 }} />
+                  <XAxis dataKey="attemptNum" tick={{ fill: '#9a93b8', fontSize: 10 }} />
+                  <YAxis domain={[0, 100]} tick={{ fill: '#9a93b8', fontSize: 10 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderColor: '#334155',
-                      borderRadius: '8px',
+                      backgroundColor: 'rgba(13, 16, 15, 0.95)',
+                      borderColor: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '6px',
                       color: '#fff',
                       fontSize: '12px',
                     }}
@@ -170,8 +181,8 @@ export const Analytics: React.FC = () => {
                   <Area
                     type="monotone"
                     dataKey="score"
-                    stroke="#38bdf8"
-                    strokeWidth={2}
+                    stroke="url(#scoreStroke)"
+                    strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#scoreGlow)"
                   />
@@ -186,7 +197,7 @@ export const Analytics: React.FC = () => {
       <div className="clean-glass-card p-6 sm:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
               <History className="w-4 h-4 text-sky-400" /> Quiz Attempt History
             </h2>
             <p className="text-xs text-slate-400">Logs of recent quiz sessions and resulting difficulty levels.</p>
