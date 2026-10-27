@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { UserProfile, DEFAULT_TOPIC_LEVELS } from '../types/user';
+import { UserProfile, DEFAULT_TOPIC_LEVELS, PREDEFINED_COLLEGES } from '../types/user';
+import { addCollege, deleteCollege, listCustomColleges, CustomCollege } from '../utils/colleges';
 import { db } from '../config/firebase';
 import { 
   collection, 
@@ -27,7 +28,8 @@ import {
   MessageSquare, 
   CheckCircle2, 
   AlertCircle,
-  Sparkles
+  Sparkles,
+  GraduationCap
 } from 'lucide-react';
 
 interface TopicRequest {
@@ -65,6 +67,17 @@ export const Admin: React.FC = () => {
   const [newTopicDesc, setNewTopicDesc] = useState<string>('');
   const [topicRequests, setTopicRequests] = useState<TopicRequest[]>([]);
 
+  // College list State (custom colleges shown in every college dropdown)
+  const [colleges, setColleges] = useState<CustomCollege[]>([]);
+  const [newCollege, setNewCollege] = useState<string>('');
+  const [collegeFilter, setCollegeFilter] = useState<string>('');
+  const [savingCollege, setSavingCollege] = useState<boolean>(false);
+  // Feedback shown next to the college form, so it's visible without scrolling up
+  const [collegeNotice, setCollegeNotice] = useState<{ ok: boolean; text: string } | null>(null);
+  // Row awaiting removal confirmation (in-page; native confirm() can be blocked)
+  const [pendingCollegeDelete, setPendingCollegeDelete] = useState<string | null>(null);
+  const [deletingCollege, setDeletingCollege] = useState<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [msg, setMsg] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -74,8 +87,57 @@ export const Admin: React.FC = () => {
   useEffect(() => {
     if (isAdmin) {
       loadAdminDashboardData();
+      loadColleges();
     }
   }, [isAdmin]);
+
+  const loadColleges = async () => {
+    try {
+      setColleges(await listCustomColleges());
+    } catch (err) {
+      console.error('Error loading colleges:', err);
+    }
+  };
+
+  const handleAddCollege = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = newCollege.trim();
+    if (!name) return;
+    try {
+      setSavingCollege(true);
+      const result = await addCollege(name);
+      if (result === 'added') {
+        setNewCollege('');
+        setCollegeNotice({ ok: true, text: `Added "${name}". It now appears in every college dropdown.` });
+        loadColleges();
+      } else if (result === 'exists') {
+        setCollegeNotice({ ok: false, text: `"${name}" is already in the college list.` });
+      } else if (result === 'predefined') {
+        setCollegeNotice({ ok: false, text: `"${name}" is already one of the built-in colleges.` });
+      } else {
+        setCollegeNotice({ ok: false, text: 'Enter a college name between 2 and 120 characters.' });
+      }
+    } catch (err) {
+      setCollegeNotice({ ok: false, text: "Couldn't add the college. Try again." });
+    } finally {
+      setSavingCollege(false);
+    }
+  };
+
+  const handleDeleteCollege = async (college: CustomCollege) => {
+    try {
+      setDeletingCollege(true);
+      await deleteCollege(college.id);
+      setCollegeNotice({ ok: true, text: `Removed "${college.name}". Students who already chose it keep it on their profile.` });
+      await loadColleges();
+    } catch (err) {
+      console.error('Error removing college:', err);
+      setCollegeNotice({ ok: false, text: "Couldn't remove the college. Check that you're signed in as an admin and try again." });
+    } finally {
+      setDeletingCollege(false);
+      setPendingCollegeDelete(null);
+    }
+  };
 
   const loadAdminDashboardData = async () => {
     try {
@@ -423,6 +485,130 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* College List Manager */}
+      <div className="neo-glass-card p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-cyber-cyan" /> College List
+            </h2>
+            <p className="text-xs text-slate-400">
+              Colleges added here appear in every college dropdown (registration, Google sign-up and profile edit),
+              alongside the {PREDEFINED_COLLEGES.length} built-in colleges. Colleges students type in also show up here.
+            </p>
+          </div>
+          <form onSubmit={handleAddCollege} className="flex gap-2 w-full md:w-auto">
+            <input
+              type="text"
+              required
+              maxLength={120}
+              value={newCollege}
+              onChange={(e) => {
+                setNewCollege(e.target.value);
+                setCollegeNotice(null);
+              }}
+              placeholder="College name (e.g. Anurag University)"
+              className="cyber-input py-2.5 text-xs md:w-72"
+            />
+            <button
+              type="submit"
+              disabled={savingCollege}
+              className="cyber-button-primary w-auto px-4 text-xs py-2.5 flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" /> Add College
+            </button>
+          </form>
+        </div>
+
+        {collegeNotice && (
+          <div
+            role="status"
+            className={`p-3 rounded-xl text-xs flex items-center gap-2 border ${
+              collegeNotice.ok
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+            }`}
+          >
+            {collegeNotice.ok ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+            <span>{collegeNotice.text}</span>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider">
+              Custom Colleges ({colleges.length})
+            </h3>
+            {colleges.length > 5 && (
+              <input
+                type="search"
+                value={collegeFilter}
+                onChange={(e) => setCollegeFilter(e.target.value)}
+                placeholder="Filter colleges"
+                aria-label="Filter colleges"
+                className="cyber-input py-1.5 text-xs w-44"
+              />
+            )}
+          </div>
+          {colleges.length === 0 ? (
+            <div className="text-xs text-slate-500 font-mono py-6 text-center border border-dashed border-white/10 rounded-2xl">
+              No custom colleges yet. Add one above.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[360px] overflow-y-auto pr-1">
+              {colleges
+                .filter((c) => c.name.toLowerCase().includes(collegeFilter.trim().toLowerCase()))
+                .map((c) => (
+                  <div key={c.id} className="p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-xs text-white truncate" title={c.name}>{c.name}</div>
+                      {c.createdAt && (
+                        <div className="text-[10px] text-slate-500 font-mono">
+                          Added {new Date(c.createdAt).toLocaleDateString()}
+                        </div>
+                      )}
+                    </div>
+                    {pendingCollegeDelete === c.id ? (
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <span className="text-[11px] text-slate-400">Remove?</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCollege(c)}
+                          disabled={deletingCollege}
+                          className="px-2 py-1 rounded-md text-[11px] font-medium bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25 disabled:opacity-50"
+                        >
+                          {deletingCollege ? 'Removing…' : 'Remove'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPendingCollegeDelete(null)}
+                          disabled={deletingCollege}
+                          className="px-2 py-1 rounded-md text-[11px] text-slate-300 border border-white/10 hover:bg-white/5"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPendingCollegeDelete(c.id);
+                          setCollegeNotice(null);
+                        }}
+                        className="text-slate-400 hover:text-red-400 p-1 flex-shrink-0"
+                        aria-label={`Remove ${c.name}`}
+                        title="Remove from list"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
             </div>
           )}
         </div>
